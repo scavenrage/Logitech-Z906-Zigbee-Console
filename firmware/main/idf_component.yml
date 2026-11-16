@@ -1,0 +1,9 @@
+## IDF Component Manager Manifest File
+# esp-zigbee-lib 2.x (stack Espressif, senza ZBOSS) tramite il livello di compatibilità 1.x
+# (CONFIG_ZB_SDK_1xx in sdkconfig.defaults), come nel firmware ESP32-H2-Custom-Zigbee 5.5-ZB2.
+# Motivo: con ZBOSS 1.6.x la tabella dei vicini riportava LQI = 255 verso tutti.
+dependencies:
+  espressif/esp-zigbee-lib: "~2.0.0"
+  espressif/led_strip: "~2.5.0"
+  idf:
+    version: ">=5.0.0"
