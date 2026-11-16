@@ -1207,7 +1207,7 @@ static void task_zb_cmd(void *pv)
 
 #define INSTALLCODE_POLICY_ENABLE   false
 #define MAX_CHILDREN                10
-#define ESP_ZB_PRIMARY_CHANNEL_MASK (1UL << 25)
+#define ESP_ZB_PRIMARY_CHANNEL_MASK ESP_ZB_TRANSCEIVER_ALL_CHANNELS_MASK   /* canali 11-26: si associa al coordinatore su qualunque canale */
 #define OTA_UPGRADE_QUERY_INTERVAL  240
 
 #define ESP_MANUFACTURER_NAME  "\x09""Handmade!"

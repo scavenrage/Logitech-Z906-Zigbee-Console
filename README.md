@@ -127,7 +127,7 @@ The bar is off when the amplifier is in standby (and at volume 0, e.g. when mute
 
 ## Zigbee endpoints (ZHA)
 
-Manufacturer `Handmade!`, model `Z906 Console`, router, channel 25.
+Manufacturer `Handmade!`, model `Z906 Console`, router. Joins a network on any channel (11–26).
 
 ![Home Assistant device page](HA.png)
 
