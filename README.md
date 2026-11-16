@@ -71,7 +71,7 @@ of the subwoofer (central unit), on the other side a JST XH 5-pin plug into CN1.
 | Ref | Part | Qty |
 |---|---|---|
 | U1 | ESP32-H2-MINI-1-N4 | 1 |
-| U2 | 3.3 V LDO regulator, SOT-223 | 1 |
+| U2 | AMS1117-3.3 (or equivalent 3.3 V LDO, SOT-223) | 1 |
 | U3 | VS1838B IR receiver | 1 |
 | Q1 | 2N7002 N-MOSFET (SOT-23) | 1 |
 | LED1–LED13 | WS2812B-2020 | 13 |
@@ -87,7 +87,7 @@ of the subwoofer (central unit), on the other side a JST XH 5-pin plug into CN1.
 | C3 | 10 µF | 1 |
 | C4 | 1 µF | 1 |
 
-Values and references are from `hardware/Schematic.png`; the LDO part number is not specified there.
+Values and references are from `hardware/Schematic.png`.
 
 ### GPIO map
 
