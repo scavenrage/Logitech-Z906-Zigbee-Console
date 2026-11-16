@@ -5,7 +5,10 @@ It talks to the Z906 amplifier over the console DB-15 serial line and exposes th
 system to **Home Assistant (ZHA)** over Zigbee. It also keeps the original IR remote
 working (volume and mute) and shows status, input and volume on a WS2812B LED bar.
 
-![Schematic](hardware/Schematic.png)
+| Front | Rear | Inside |
+|---|---|---|
+| ![Front](hardware/IMG_20261116_214132.jpg) | ![Rear](hardware/IMG_20261116_214146.jpg) | ![PCB](hardware/IMG_20261116_214209.jpg) |
+| Status and input LEDs, IR window, volume bar | 5-pin amplifier connector and 4-pin USB connector | PCB in the 3D-printed enclosure (ESP32-H2-MINI-1, VS1838B, WS2812B-2020) |
 
 ## Features
 
@@ -27,10 +30,17 @@ working (volume and mute) and shows status, input and volume on a WS2812B LED ba
 |---|---|
 | `firmware/` | ESP-IDF project (ESP32-H2) |
 | `firmware/main/` | `main.c` (amplifier protocol, IR, LEDs, Zigbee), `ota.c/.h` (version, rollback) |
+| `binaries/` | Ready-to-flash firmware v3 (see [Flashing without ESP-IDF](#flashing-without-esp-idf)) |
 | `hardware/` | EasyEDA Pro schematic and PCB (`.epro2`), schematic image, photos |
-| `hardware/Enclosure/` | Enclosure (SketchUp `.skp` and `.stl`) |
+| `hardware/Enclosure/` | 3D-printable enclosure: `z906.stl` (ready to slice) and `Z906.skp` (original SketchUp model) |
 
 ## Hardware
+
+![Schematic](hardware/Schematic.png)
+
+Connectors: a 5-pin connector for the cable to the amplifier and a 4-pin connector for USB
+(+V, D−, D+, GND), used for power, logs and flashing.
+
 
 | GPIO | Function |
 |---|---|
@@ -46,8 +56,26 @@ working (volume and mute) and shows status, input and volume on a WS2812B LED ba
 Amplifier connector: pin 6 = GND, pin 8 = GPIO11, pin 12 = GPIO4, pin 13 = GPIO5,
 pin 15 = GPIO1 through the MOSFET.
 
-LED chain: LED1 = console status, LED2 = selected input, LED3–LED13 = volume bar
-(11 LEDs, 4 brightness steps each → 44 steps for volume 0–43).
+## LED colours
+
+**LED1 — console status**
+
+| Colour | Meaning |
+|---|---|
+| Red, slow blink (0.5 s on / 0.5 s off) | Not connected to the Zigbee network (joining / searching) |
+| Blue, steady (dim) | Connected to Zigbee, amplifier in standby |
+| Green, fast blink | Amplifier power-on in progress |
+| Green, steady | Amplifier on |
+
+**LED2 — selected input** (off when the amplifier is in standby)
+
+| Input | 1 | 2 | 3 | 4 | 5 | 6 (AUX) |
+|---|---|---|---|---|---|---|
+| Colour | White | Cyan | Green | Blue | Magenta | Yellow |
+
+**LED3–LED13 — volume bar** (amber): 11 LEDs with 4 brightness steps each, i.e. 44 steps for
+volume 0–43. A LED is fully lit when the volume reaches its last step, partially lit in between.
+The bar is off when the amplifier is in standby (and at volume 0, e.g. when muted).
 
 ## Zigbee endpoints (ZHA)
 
@@ -100,6 +128,55 @@ idf.py -p COMx build flash monitor
 
 `sdkconfig` is generated from `sdkconfig.defaults`. Updates are done over USB: Zigbee OTA is not
 available in the esp-zigbee-lib 2.0.5 compatibility layer.
+
+## Flashing without ESP-IDF
+
+The `binaries/` folder contains firmware **v3** (ESP-IDF 5.5.6, esp-zigbee-lib 2.0.5), flashed
+through the console's own USB connector (ESP32-H2 native USB, no USB-serial adapter needed).
+Checksums are in `binaries/SHA256SUMS.txt`.
+
+| File | Offset | Use |
+|---|---|---|
+| `z906-console-v3-full.bin` | `0x0` | **First installation**: bootloader + partition table + app in one file |
+| `bootloader.bin` | `0x0` | Separate parts (same content as the full image) |
+| `partition-table.bin` | `0x8000` | |
+| `ota_data_initial.bin` | `0x10000` | |
+| `z906_console.bin` | `0x20000` | **Update** of an already installed console (application only) |
+
+> **Note:** the full image also overwrites the `nvs` area, so saved settings and the Zigbee
+> pairing are erased: the console must be paired again in ZHA. To update a console that is
+> already working, flash only `z906_console.bin` at `0x20000`.
+
+**Option 1 — browser (Chrome or Edge, no installation)**
+
+1. Open [ESP Tool (esptool-js)](https://espressif.github.io/esptool-js/) and click **Connect**,
+   choosing the console's USB port.
+2. Add the file and its offset from the table above (`z906-console-v3-full.bin` at `0x0`
+   for a first installation).
+3. Click **Program**, then reset or power-cycle the console.
+
+**Option 2 — esptool (Python)**
+
+```
+pip install esptool
+esptool.py --chip esp32h2 --port COMx write_flash 0x0 z906-console-v3-full.bin
+```
+
+Update only:
+
+```
+esptool.py --chip esp32h2 --port COMx write_flash 0x20000 z906_console.bin
+```
+
+If the board does not enter download mode automatically, keep GPIO9 low (factory reset
+button / H1) while powering it up.
+
+## Pairing with Home Assistant (ZHA)
+
+1. In ZHA choose **Add device** (permit join).
+2. Power the console: when it is not in a network it searches automatically (LED1 red, slow
+   blink); once joined LED1 turns blue.
+3. The rear, centre and subwoofer levels appear as generic number entities: rename them in HA.
 
 Factory reset (leave the Zigbee network): hold the button on GPIO9 for 5 seconds.
 
