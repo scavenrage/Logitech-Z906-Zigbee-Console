@@ -38,8 +38,58 @@ working (volume and mute) and shows status, input and volume on a WS2812B LED ba
 
 ![Schematic](hardware/Schematic.png)
 
-Connectors: a 5-pin connector for the cable to the amplifier and a 4-pin connector for USB
-(+V, D−, D+, GND), used for power, logs and flashing.
+### Connectors and cables
+
+**Power / USB — U4, JST XH 4-pin (B4B-XH-AM)**
+
+| U4 pin | Signal |
+|---|---|
+| 4 | +5 V |
+| 3 | USB D− (22 Ω → GPIO26) |
+| 2 | USB D+ (22 Ω → GPIO27) |
+| 1 | GND |
+
+A USB cable ending in a JST XH 4-pin plug. **External 5 V power is required**: the console is
+powered through this USB connector (5 V → 3.3 V LDO), not by the amplifier. The same connection
+is used for logs and flashing.
+
+**Amplifier — CN1, JST XH 5-pin (B5B-XH-AM)**
+
+Cable: on one side a **DB-15 high-density plug (3 rows, VGA type)** going into the console port
+of the subwoofer (central unit), on the other side a JST XH 5-pin plug into CN1.
+
+| CN1 pin | DB-15 pin | Signal | ESP32-H2 |
+|---|---|---|---|
+| 1 | 8 | Amplifier status | GPIO11 (direct) |
+| 2 | 12 | Amplifier TX → console | GPIO4 (UART RX) |
+| 3 | 13 | Console → amplifier RX | GPIO5 (UART TX) |
+| 4 | 15 | Power control | Q1 2N7002 drain (gate: GPIO1 via 1 kΩ, 10 kΩ pull-down) |
+| 5 | 6 | GND | GND |
+
+### Bill of materials
+
+| Ref | Part | Qty |
+|---|---|---|
+| U1 | ESP32-H2-MINI-1-N4 | 1 |
+| U2 | 3.3 V LDO regulator, SOT-223 | 1 |
+| U3 | VS1838B IR receiver | 1 |
+| Q1 | 2N7002 N-MOSFET (SOT-23) | 1 |
+| LED1–LED13 | WS2812B-2020 | 13 |
+| CN1 | JST XH 5-pin, B5B-XH-AM | 1 |
+| U4 | JST XH 4-pin, B4B-XH-AM | 1 |
+| H1 | 2-pin header (GPIO9 to GND: boot / factory reset) | 1 |
+| R1 | 470 Ω (LED data) | 1 |
+| R2, R3, R4, R6 | 10 kΩ (Q1 gate pull-down, EN, GPIO8, GPIO9 pull-ups) | 4 |
+| R9, R10 | 22 Ω (USB D−/D+) | 2 |
+| R11 | 100 kΩ | 1 |
+| R12 | 1 kΩ (Q1 gate) | 1 |
+| C1 | 100 nF | 1 |
+| C3 | 10 µF | 1 |
+| C4 | 1 µF | 1 |
+
+Values and references are from `hardware/Schematic.png`; the LDO part number is not specified there.
+
+### GPIO map
 
 
 | GPIO | Function |
@@ -53,8 +103,6 @@ Connectors: a 5-pin connector for the cable to the amplifier and a 4-pin connect
 | GPIO11 | Amplifier pin 8 (status input) |
 | GPIO26/27 | USB D−/D+ (logs, flashing) |
 
-Amplifier connector: pin 6 = GND, pin 8 = GPIO11, pin 12 = GPIO4, pin 13 = GPIO5,
-pin 15 = GPIO1 through the MOSFET.
 
 ## LED colours
 
@@ -80,6 +128,8 @@ The bar is off when the amplifier is in standby (and at volume 0, e.g. when mute
 ## Zigbee endpoints (ZHA)
 
 Manufacturer `Handmade!`, model `Z906 Console`, router, channel 25.
+
+![Home Assistant device page](HA.png)
 
 | EP | Cluster | Entity | Notes |
 |---|---|---|---|
