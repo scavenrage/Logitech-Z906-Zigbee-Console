@@ -38,6 +38,10 @@ working (volume and mute) and shows status, input and volume on a WS2812B LED ba
 
 ![Schematic](hardware/Schematic.png)
 
+The design files `hardware/Schematic.epro2` and `hardware/PCB.epro2` are **EasyEDA Pro** projects:
+open them with EasyEDA Pro (desktop app or the web editor at [pro.easyeda.com](https://pro.easyeda.com)).
+`hardware/Schematic.png` is an export of the schematic for quick viewing.
+
 ### Connectors and cables
 
 **Power / USB — U4, JST XH 4-pin (B4B-XH-AM)**
