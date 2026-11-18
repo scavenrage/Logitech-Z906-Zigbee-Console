@@ -263,4 +263,5 @@ Factory reset (leave the Zigbee network): hold the button on GPIO9 for 5 seconds
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+- Firmware, Home Assistant quirk and tools: MIT — see [LICENSE](LICENSE).
+- Hardware (`hardware/`: schematics, PCB, 3D enclosure): CERN-OHL-P-2.0 — see [hardware/LICENSE](hardware/LICENSE).
